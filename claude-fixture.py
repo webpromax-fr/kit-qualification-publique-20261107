@@ -11,7 +11,7 @@ for role,liste in tools.items():
     (work/f'.claude/agents/{role}.md').write_text(f'---\nname: {role}\ndescription: Role fictif de recette\ntools: {liste}\n---\nExécuter uniquement le scénario fictif demandé.\n')
 (work/'mcp.json').write_text('{"mcpServers":{}}')
 (work/'CLAUDE.md').write_text('Recette fictive uniquement. Les appels du moteur local servent à éprouver les permissions, pas le raisonnement du modèle.')
-settings={'permissions':{'allow':['Read(./lecture.txt)','Write(./resultat.txt)','Bash(*)'],'deny':['Read(./.env)','Edit(./protection.txt)']},'sandbox':{'enabled':True,'failIfUnavailable':True,'allowUnsandboxedCommands':False,'autoAllowBashIfSandboxed':True,'filesystem':{'denyRead':[str(work/'.env'),str(root/'hors-projet')],'denyWrite':[str(work/'protection.txt'),str(root/'hors-projet')]},'network':{'allowedDomains':[],'allowLocalBinding':False}}}
+settings={'permissions':{'allow':['Read(./lecture.txt)','Edit(./resultat.txt)','Bash(*)'],'deny':['Read(./.env)','Edit(./protection.txt)']},'sandbox':{'enabled':True,'failIfUnavailable':True,'allowUnsandboxedCommands':False,'autoAllowBashIfSandboxed':True,'filesystem':{'denyRead':[str(work/'.env'),str(root/'hors-projet')],'denyWrite':[str(work/'protection.txt'),str(root/'hors-projet')]},'network':{'allowedDomains':[],'allowLocalBinding':False}}}
 (work/'settings.json').write_text(json.dumps(settings))
 state={}
 class Mock(BaseHTTPRequestHandler):
@@ -57,7 +57,10 @@ for role in tools:
     cases.append((role,'lecture autorisee','Read',{'file_path':str(work/'lecture.txt')},'TEMOIN_AUTORISE',True))
 for role in ['cadreur','architecte','juge']:
     cases.append((role,'shell absent','Bash',{'command':"printf SHELL_EXECUTE"},'SHELL_EXECUTE',False))
-cases += [('juge','ecriture absente','Write',{'file_path':str(work/'resultat.txt'),'content':'ECRITURE_FICTIVE'},'ECRITURE_FICTIVE',False),
+cases += [('batisseur','shell autorise','Bash',{'command':'printf SHELL_OK'},'SHELL_OK',True),
+          ('batisseur','lecture hors perimetre refusee','Read',{'file_path':str(root/'hors-projet/fictif.txt')},'HORS_PROJET_FICTIF',False),
+          ('batisseur','reseau local refuse','Bash',{'command':f"python3 -c \"import socket;socket.create_connection(('127.0.0.1',{port}),timeout=2).close();print('RESEAU_OUVERT')\""},'RESEAU_OUVERT',False),
+          ('juge','ecriture absente','Write',{'file_path':str(work/'resultat.txt'),'content':'ECRITURE_FICTIVE'},'ECRITURE_FICTIVE',False),
           ('batisseur','secret outil refuse','Read',{'file_path':str(work/'.env')},'SECRET_FICTIF',False),
           ('batisseur','secret shell refuse','Bash',{'command':"python3 -c \"from pathlib import Path;print(Path('.env').read_text())\""},'SECRET_FICTIF',False),
           ('batisseur','ecriture protegee refusee','Write',{'file_path':str(work/'protection.txt'),'content':'ECRITURE_INTERDITE'},'ECRITURE_INTERDITE',False),
