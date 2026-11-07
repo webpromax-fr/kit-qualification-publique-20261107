@@ -1,5 +1,7 @@
 name: qualification-isolation-claude
-on: [workflow_dispatch]
+on:
+  push:
+    branches: [isolation-linux-20261107]
 permissions:
   contents: read
 jobs:
