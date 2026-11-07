@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y bubblewrap socat
-          npm install --prefix "$RUNNER_TEMP/claude" --ignore-scripts @anthropic-ai/claude-code@2.1.312
+          npm install --prefix "$RUNNER_TEMP/claude" @anthropic-ai/claude-code@2.1.312
           "$RUNNER_TEMP/claude/node_modules/.bin/claude" --version
       - name: Recette sans API payante ni donnees reelles
         env:
