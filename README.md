@@ -1,2 +1,3 @@
-# kit-qualification-publique-20261107
-Banc fictif de qualification des protections et permissions. Aucun kit commercial ni donnée client.
+# Qualification fictive WebProMax
+
+Banc public distinct du kit commercial. Aucune donnée client, aucun secret, aucun code du produit.
