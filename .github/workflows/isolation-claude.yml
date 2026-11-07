@@ -1,0 +1,22 @@
+name: qualification-isolation-claude
+on: [workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  isolation-claude:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Preparer le client et son isolation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y bubblewrap socat
+          npm install --prefix "$RUNNER_TEMP/claude" --ignore-scripts @anthropic-ai/claude-code@2.1.312
+          "$RUNNER_TEMP/claude/node_modules/.bin/claude" --version
+      - name: Recette sans API payante ni donnees reelles
+        env:
+          CLAUDE_FIXTURE_BIN: ${{ runner.temp }}/claude/node_modules/.bin/claude
+        run: python3 claude-fixture.py
